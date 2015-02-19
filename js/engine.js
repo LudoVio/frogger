@@ -32,6 +32,8 @@
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+
+
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -60,7 +62,7 @@
          * function again as soon as the browser is able to draw another frame.
          */
         requestID = win.requestAnimationFrame(main);
-        console.log(requestID);
+        console.log('play', requestID);
     }
 
     /* This function does some initial setup that should only occur once,
@@ -164,8 +166,6 @@
      */
     function reset() {
         player.start();
-        console.log(requestID);
-        win.cancelAnimationFrame(requestID);
     }
 
     /* Go ahead and load all of the images we know we're going to need to
