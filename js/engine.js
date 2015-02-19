@@ -1,3 +1,6 @@
+/* global checkCollisions, allEnemies, Resources, player */
+/* jshint -W030 */
+
 /* Engine.js
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
@@ -14,7 +17,7 @@
  * a little simpler to work with.
  */
 
-var Engine = (function (global) {
++function (global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
@@ -23,7 +26,7 @@ var Engine = (function (global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime, requestID;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -56,7 +59,8 @@ var Engine = (function (global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+        requestID = win.requestAnimationFrame(main);
+        console.log(requestID);
     }
 
     /* This function does some initial setup that should only occur once,
@@ -159,7 +163,9 @@ var Engine = (function (global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        player.start();
+        console.log(requestID);
+        win.cancelAnimationFrame(requestID);
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -180,4 +186,5 @@ var Engine = (function (global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
-})(this);
+    global.init = init;
+}(this);
