@@ -71,6 +71,11 @@ var inputs = function(eventSource) {
 
 
 
+/* menuLayout : display a menu to let the player chose his chararactere */
+function menuLayout
+
+
+
 /* Display a menu :
  * - display if a player won or lost his last game
  * - display a choice of available characters and let the player chose one
