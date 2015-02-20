@@ -76,7 +76,7 @@ var inputs = function() {
  * - display a choice of available characters and let the player chose one
  * - return the choice
  */
-function menu(context, inputs, returnCallback, result) {
+function menu(context, inputs, returnCallback) {
     function drawText(text, color) {
         context.fillStyle = color;
         context.font = '48px serif';
@@ -101,7 +101,7 @@ function menu(context, inputs, returnCallback, result) {
     var selector = new Drawable('images/Selector.png');
     var choice = 2;
 
-    inputs(function(action) {
+    function listener(action) {
         switch(action) {
             case 'left':
                 if(choice > 0) {
@@ -114,10 +114,15 @@ function menu(context, inputs, returnCallback, result) {
                 }
                 break;
             case 'select':
+                inputs(function(){});
                 returnCallback(choice);
                 break;
         }
-    });
+    }
+
+    function listen() {
+        inputs(listener);
+    }
 
     function draw() {
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -131,7 +136,14 @@ function menu(context, inputs, returnCallback, result) {
         });
     }
 
-    return draw;
+    var result;
+    function setResult(newResult) {
+        result = newResult;
+    }
+
+    return {listen: listen,
+            draw: draw,
+            setResult: setResult};
 }
 
 
@@ -262,6 +274,10 @@ document.addEventListener('keyup', function(e) {
 
 var frogger = {};
 frogger.start = function() {
-    var mymenu = menu(ctx, null, true);
-    mymenu();
+    var mymenu = menu(ctx, inputs, null);
+    mymenu.listen();
+    +function draw() {
+        mymenu.draw();
+        window.requestAnimationFrame(draw);
+    }();
 };
