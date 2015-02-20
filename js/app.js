@@ -1,10 +1,3 @@
-// Returns a random integer between min (included) and max (excluded)
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-
-
 // Class for drawable objects
 var Drawable = function (sprite, collideZone) {
     this.sprite = sprite;
@@ -19,6 +12,11 @@ var Drawable = function (sprite, collideZone) {
 Drawable.prototype.setPosition = function(x, y) {
     this.x = x;
     this.y = y;
+};
+
+// Get the position
+Drawable.prototype.getPosition = function() {
+    return [this.x, this.y];
 };
 
 // Move the drawable
@@ -40,6 +38,108 @@ Drawable.prototype.render = function() {
     /* global ctx, Resources */
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
+
+// Draw the drawable
+Drawable.prototype.draw = function(context) {
+    context.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+
+
+// Listen inputs, filter, transform to an action name, then send them
+// to the last one who have made the request via inputs(requester)
+// requester : function(action -> string)
+var inputs = function() {
+    var listener = function(){};
+
+    var actions = {32: 'select',
+                   37: 'left',
+                   38: 'up',
+                   39: 'right',
+                   40: 'down'
+                  };
+
+    document.addEventListener('keyup', function(event) {
+        if(event.keyCode in actions) {
+            listener(actions[event.keyCode]);
+        }});
+
+    return function(newListener) {
+        listener = newListener;
+    };
+}();
+
+
+
+/* Display a menu :
+ * - display if a player won or lost his last game
+ * - display a choice of available characters and let the player chose one
+ * - return the choice
+ */
+function menu(context, inputs, returnCallback, result) {
+    function drawText(text, color) {
+        context.fillStyle = color;
+        context.font = '48px serif';
+        context.textAlign = 'center';
+        context.fillText(text, context.canvas.width/2, 50);
+        context.strokeText(text, context.canvas.width/2, 50);
+    }
+
+    var charsURL = ['images/char-boy.png',
+                 'images/char-cat-girl.png',
+                 'images/char-horn-girl.png',
+                 'images/char-pink-girl.png',
+                 'images/char-princess-girl.png'
+                ];
+
+    var chars = charsURL.map(function(url, idx) {
+        var drawable = new Drawable(url);
+        drawable.setPosition(idx*101, 200);
+        return drawable;
+    });
+
+    var selector = new Drawable('images/Selector.png');
+    var choice = 2;
+
+    inputs(function(action) {
+        switch(action) {
+            case 'left':
+                if(choice > 0) {
+                    --choice;
+                }
+                break;
+            case 'right':
+                if(choice < 4) {
+                    ++choice;
+                }
+                break;
+            case 'select':
+                returnCallback(choice);
+                break;
+        }
+    });
+
+    function draw() {
+        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+        if(result === true) {drawText('You Win !', 'green');}
+        if(result === false) {drawText('You Lose !', 'red');}
+        selector.setPosition.apply(selector, chars[choice].getPosition());
+        selector.draw(context);
+        chars.forEach(function(drawable) {
+            drawable.draw(context);
+        });
+    }
+
+    return draw;
+}
+
+
+
+// Returns a random integer between min (included) and max (excluded)
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 
 
 
@@ -149,6 +249,7 @@ var player = new Player();
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
+        32: 'select',
         37: 'left',
         38: 'up',
         39: 'right',
@@ -157,3 +258,10 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+
+var frogger = {};
+frogger.start = function() {
+    var mymenu = menu(ctx, null, true);
+    mymenu();
+};

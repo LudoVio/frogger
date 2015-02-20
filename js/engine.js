@@ -72,9 +72,6 @@
 
 
 
-
-
-
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -103,7 +100,6 @@
          * function again as soon as the browser is able to draw another frame.
          */
         requestID = win.requestAnimationFrame(main);
-        console.log('play', requestID);
     }
 
     /* This function does some initial setup that should only occur once,
@@ -218,9 +214,14 @@
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png',
+        'images/Selector.png'
     ]);
-    Resources.onReady(init);
+    Resources.onReady(frogger.start);
 
     /* Assign the canvas' context object to the global variable (the window
      * object when run in a browser) so that developer's can use it more easily
