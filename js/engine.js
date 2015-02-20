@@ -221,7 +221,7 @@
         'images/char-princess-girl.png',
         'images/Selector.png'
     ]);
-    Resources.onReady(frogger.start);
+    Resources.onReady(froggerMain);
 
     /* Assign the canvas' context object to the global variable (the window
      * object when run in a browser) so that developer's can use it more easily

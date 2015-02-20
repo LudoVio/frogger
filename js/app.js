@@ -49,7 +49,7 @@ Drawable.prototype.draw = function(context) {
 // Listen inputs, filter, transform to an action name, then send them
 // to the last one who have made the request via inputs(requester)
 // requester : function(action -> string)
-var inputs = function() {
+var inputs = function(eventSource) {
     var listener = function(){};
 
     var actions = {32: 'select',
@@ -59,7 +59,7 @@ var inputs = function() {
                    40: 'down'
                   };
 
-    document.addEventListener('keyup', function(event) {
+    eventSource.addEventListener('keyup', function(event) {
         if(event.keyCode in actions) {
             listener(actions[event.keyCode]);
         }});
@@ -67,7 +67,7 @@ var inputs = function() {
     return function(newListener) {
         listener = newListener;
     };
-}();
+};
 
 
 
@@ -76,7 +76,7 @@ var inputs = function() {
  * - display a choice of available characters and let the player chose one
  * - return the choice
  */
-function menu(context, inputs, returnCallback) {
+function menu(screen, inputs, returnCallback) {
     function drawText(text, color) {
         context.fillStyle = color;
         context.font = '48px serif';
@@ -124,11 +124,11 @@ function menu(context, inputs, returnCallback) {
         inputs(listener);
     }
 
-    function draw() {
+    function draw(context) {
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-        if(result === true) {drawText('You Win !', 'green');}
-        if(result === false) {drawText('You Lose !', 'red');}
+        if(result === true) {drawText(context, 'You Win !', 'green');}
+        if(result === false) {drawText(context'You Lose !', 'red');}
         selector.setPosition.apply(selector, chars[choice].getPosition());
         selector.draw(context);
         chars.forEach(function(drawable) {
@@ -272,12 +272,30 @@ document.addEventListener('keyup', function(e) {
 });
 
 
-var frogger = {};
-frogger.start = function() {
-    var mymenu = menu(ctx, inputs, null);
-    mymenu.listen();
+
+var start = function(context, eventSource) {
+    inputs = inputs(eventSource);
+    menu = menu(context, inputs, next);
+    game = game();
+
+    function next(charPlayer) {
+
+    };
+
+    menu.listen();
+    menu.setResult(false);
     +function draw() {
         mymenu.draw();
-        window.requestAnimationFrame(draw);
+        menuID = window.requestAnimationFrame(draw);
     }();
+};
+
+var init(context, eventSource) {
+    inputs = inputs(eventSource);
+    menu = menu.bind(null, context, inputs);
+    menuState = menuState.bind(menu);
+};
+
+function froggerMain() {
+
 };
