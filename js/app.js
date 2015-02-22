@@ -71,11 +71,6 @@ var inputs = function(eventSource) {
 
 
 
-/* menuLayout : display a menu to let the player chose his chararactere */
-function menuLayout
-
-
-
 /* Display a menu :
  * - display if a player won or lost his last game
  * - display a choice of available characters and let the player chose one
@@ -133,7 +128,7 @@ function menu(screen, inputs, returnCallback) {
         context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         context.fillRect(0, 0, context.canvas.width, context.canvas.height);
         if(result === true) {drawText(context, 'You Win !', 'green');}
-        if(result === false) {drawText(context'You Lose !', 'red');}
+        if(result === false) {drawText(context, 'You Lose !', 'red');}
         selector.setPosition.apply(selector, chars[choice].getPosition());
         selector.draw(context);
         chars.forEach(function(drawable) {
@@ -295,7 +290,7 @@ var start = function(context, eventSource) {
     }();
 };
 
-var init(context, eventSource) {
+var init = function(context, eventSource) {
     inputs = inputs(eventSource);
     menu = menu.bind(null, context, inputs);
     menuState = menuState.bind(menu);
