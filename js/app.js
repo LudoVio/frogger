@@ -243,7 +243,7 @@ function areCollided(objA, objB) {
 function checkCollisions() {
     allEnemies.forEach(function(enemy) {
         if(areCollided(enemy, player)) {
-            init();
+            reset();
         }
     });
 }
