@@ -29,6 +29,7 @@ var GameEngine = function(width, height) {
 
     // A list of added layers
     var layers = [];
+    this.layersDict = {};
 
     // A list of required images' URLs
     var requiredImages = [];
@@ -40,6 +41,7 @@ var GameEngine = function(width, height) {
     /* Add a layer to the game engine */
     this.addLayer = function(layer) {
         layers.push(layer);
+        this.layersDict[layer.name] = layer;
 
         // for each url in layers.requiredImages :
         //     add it to requiredImages if not already there
@@ -99,8 +101,8 @@ var GameEngine = function(width, height) {
 
         // update and render each layer
         layers.forEach(function(layer) {
-            if(layer.update) {layer.update(now);}
-            if(layer.draw) {layer.draw(context);}
+            if(layer.running && layer.update) {layer.update(now);}
+            if(layer.visible && layer.draw) {layer.draw(context);}
         });
     };
 
@@ -129,10 +131,18 @@ var GameEngine = function(width, height) {
  */
 var Layer = function(name) {
     this.name = name;
+
     // A list of images' urls needed by the layer
     this.requiredImages = [];
+
     // A list of drawables to draw on each call to this.draw(context)
     this.drawables = [];
+
+    // true if layer.update() should be called on each loop
+    // this.running = undefined;
+
+    // true if layer.draw() should be called on each loop
+    // this.visible = undefined;
 };
 
 
@@ -146,6 +156,9 @@ var Layer = function(name) {
  * now = a DOMHighResTimeStampthe, the time since start of navigation
  */
 // Layer.prototype.update = function(now) {};
+
+
+/* true if layer.update should be called on each loop */
 
 
 /* this will be called every loop
