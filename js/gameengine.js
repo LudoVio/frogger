@@ -4,6 +4,12 @@
  * create an instance :
  *     var engine = new GameEngine(width, height);
  *
+ * choose the element for capture input :
+ *     var gameInputs = GameInputs(document);
+ *
+ * send inputs to an handler :
+ *     gameInputs(actionHandler);
+ *
  * add layers :
  *     engine.addLayer(myLayer_1);
  *     engine.addLayer(myLayer_2);
@@ -13,15 +19,6 @@
  *
  * start the engine :
  *     engine.start();
- *
- * A layer is an object with optionals properties and methods :
- * layer.requiredImages : a list of images' urls needed by the layer
- * layer.onLoad(images) : this will be called when all required images are loaded
- *                        images = key : url, value : HTMLImageElement
- * layer.update(now) : this will be called every loop, usefull for update the layer
- *                     now = a DOMHighResTimeStampthe, the time since start of navigation
- * layer.draw(context) : this will be called every loop, usefull for render the layer
- *                         context = a CanvasRenderingContext2D, the rendering target
  */
 var GameEngine = function(width, height) {
     // Create the canvas
@@ -120,10 +117,51 @@ var GameEngine = function(width, height) {
 
 
 
+/* Layer
+ * A game is made of differents layers, for example a background, entities, a menu etc ...
+ * layer.requiredImages : a list of images' urls needed by the layer
+ * layer.onLoad(images) : this will be called when all required images are loaded
+ *                        images = key : url, value : HTMLImageElement
+ * layer.update(now) : this will be called every loop, usefull for update the layer
+ *                     now = a DOMHighResTimeStampthe, the time since start of navigation
+ * layer.draw(context) : this will be called every loop, usefull for render the layer
+ *                         context = a CanvasRenderingContext2D, the rendering target
+ */
+var Layer = function(name) {
+    this.name = name;
+    // A list of images' urls needed by the layer
+    this.requiredImages = [];
+    // A list of drawables to draw on each call to this.draw(context)
+    this.drawables = [];
+};
+
+
+/* Virtual, this will be called when all required images are loaded
+ * images = key : url, value : HTMLImageElement
+ */
+// Layer.prototype.onLoad = function(images) {};
+
+
+/* Virtual, this will be called every loop, usefull for update the layer
+ * now = a DOMHighResTimeStampthe, the time since start of navigation
+ */
+// Layer.prototype.update = function(now) {};
+
+
+/* this will be called every loop
+ * context = a CanvasRenderingContext2D, the rendering target
+ */
+Layer.prototype.draw = function(context) {
+    this.drawables.forEach(function(drawable) {
+        drawable.draw(context);
+    });
+};
+
+
 /* Drawable
  * Represente something that can be draw on a render target
  */
-var Drawable = function (x, y) {
+var Drawable = function(x, y) {
     this.x = x || 0;
     this.y = y || 0;
 };
@@ -160,4 +198,30 @@ Sprite.prototype = Object.create(Drawable.prototype);
 /* draw the sprite on a context */
 Sprite.prototype.draw = function(context) {
     context.drawImage(this.image, this.x, this.y);
+};
+
+
+/* Listen inputs, filter, transform to an action name, then send them
+ * to the last one who have made the request via inputs(requester)
+ * requester : function(action -> string)
+ */
+var GameInputs = function(eventSource) {
+    var listener = function(){};
+
+    var actions = {32: 'select',
+                   37: 'left',
+                   38: 'up',
+                   39: 'right',
+                   40: 'down'
+                  };
+
+    eventSource.addEventListener('keyup', function(event) {
+        if(event.keyCode in actions) {
+            listener(actions[event.keyCode]);
+        }
+    });
+
+    return function(newListener) {
+        listener = newListener;
+    };
 };
