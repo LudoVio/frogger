@@ -197,6 +197,7 @@ menuLayer.requiredImages = [
 menuLayer.onLoad = function(images) {
     this.visible = true;
     this.drawables.push(new Sprite(images['images/Selector.png'], 0, 200));
+    this.selector = this.drawables[0];
     this.requiredImages.forEach(function(url, idx) {
         this.drawables.push(new Sprite(images[url], (idx - 1) * 101, 200));
     }.bind(this));
@@ -207,15 +208,35 @@ menuLayer.drawText = function(text, color, context) {
     context.font = '48px serif';
     context.textAlign = 'center';
     context.fillText(text, context.canvas.width/2, 50);
+    context.strokeStyle = 'white';
     context.strokeText(text, context.canvas.width/2, 50);
 };
 
 menuLayer.draw = function(context) {
     context.fillStyle = 'rgba(0, 0, 0, 0.85)';
     context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-    if(this.result === true) {this.drawText(context, 'You Win !', 'green');}
-    if(this.result === false) {this.drawText(context, 'You Lose !', 'red');}
+    if(this.result === true) {this.drawText('You Win !', 'green', context);}
+    if(this.result === false) {this.drawText('You Lose !', 'red', context);}
     Layer.prototype.draw.call(this, context);
+};
+
+
+menuLayer.actionHandler = function(action) {
+    switch(action) {
+        case 'left':
+            if(this.selector.x > 0) {
+                this.selector.move(-101, 0);
+            }
+            break;
+        case 'right':
+            if(this.selector.x < 101*4) {
+                this.selector.move(101, 0);
+            }
+            break;
+        case 'select':
+
+            break;
+    }
 };
 
 
@@ -237,8 +258,13 @@ var Frogger = function() {
 
 
 /* pause all layer and display the main menu */
-Frogger.prototype.mainMenu = function() {
-
+Frogger.prototype.mainMenu = function(result) {
+    var menu = this.engine.layersDict['menu'];
+    this.gameInputs(menu.actionHandler.bind(menu));
+    this.engine.layersDict['enemies'].running = false;
+    if(result) {
+        this.engine.layersDict['menu'].result = result;
+    }
 };
 
 
