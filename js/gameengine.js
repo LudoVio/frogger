@@ -35,7 +35,7 @@ var GameEngine = function(width, height) {
     var requiredImages = [];
 
     // key = URL, value = Image()
-    var images = {};
+    this.images = {};
 
 
     /* Add a layer to the game engine */
@@ -66,7 +66,7 @@ var GameEngine = function(width, height) {
     var loadedOne = function(url) {
         remove(url, requiredImages);
         if(requiredImages.length === 0) {
-            loadedAll();
+            loadedAll.call(this);
         }
     };
 
@@ -77,8 +77,8 @@ var GameEngine = function(width, height) {
      */
     var loadedAll = function() {
         layers.forEach(function(layer) {
-            layer.onLoad(images);
-        });
+            layer.onLoad(this.images);
+        }.bind(this));
         requestAnimationFrame(mainLoop);
     };
 
@@ -87,10 +87,10 @@ var GameEngine = function(width, height) {
     this.start = function() {
         // create and load each required images
         requiredImages.slice(0).forEach(function(url) {
-            images[url] = new Image();
-            images[url].onload = loadedOne.bind(null, url);
-            images[url].src = url;
-        });
+            this.images[url] = new Image();
+            this.images[url].onload = loadedOne.bind(this, url);
+            this.images[url].src = url;
+        }.bind(this));
     };
 
 
@@ -112,7 +112,7 @@ var GameEngine = function(width, height) {
         return {
             layers: layers,
             requiredImages: requiredImages,
-            images: images
+            images: this.images
         };
     };
 };

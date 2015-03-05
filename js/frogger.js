@@ -84,7 +84,7 @@ var Player = function(image, x, y) {
                         'height': 20};
     Sprite.call(this, image, x, y);
 
-    this.setPosition(101*2, 83*5-30);
+    this.start();
 };
 
 /* extend Sprite */
@@ -93,11 +93,10 @@ Player.prototype = Object.create(Sprite.prototype);
 /* Place the player at starting point */
 Player.prototype.start = function() {
     this.setPosition(101*2, 83*5-30);
-    gameInputs(this.handleAction.bind(this));
 };
 
 /* React to user inputs */
-Player.prototype.handleAction = function(action) {
+Player.prototype.actionHandler = function(action) {
     switch(action) {
         case 'up':
             if(this.y > 83-30) {this.move(0, -83);}
@@ -199,7 +198,7 @@ menuLayer.onLoad = function(images) {
     this.drawables.push(new Sprite(images['images/Selector.png'], 0, 200));
     this.selector = this.drawables[0];
     this.requiredImages.forEach(function(url, idx) {
-        this.drawables.push(new Sprite(images[url], (idx - 1) * 101, 200));
+        if (idx >= 1) this.drawables.push(new Sprite(images[url], (idx - 1) * 101, 200));
     }.bind(this));
 };
 
@@ -234,24 +233,29 @@ menuLayer.actionHandler = function(action) {
             }
             break;
         case 'select':
-
+            var selection = Math.floor(this.selector.x / 101) + 1;
+            var image = this.drawables[selection].image;
+            console.log(this.drawables, selection, image)
+            this.selectCallback(this.drawables[selection].image);
             break;
     }
 };
 
 
-/* The ame of frogger
+/* The game of frogger
  * this is a very simple pseudo state machine
  */
 var Frogger = function() {
     // configure and start the game
     this.engine = new GameEngine(505, 606);
-    document.body.appendChild(this.engine.canvas);
+    var element = document.getElementById("window")
+    element.appendChild(this.engine.canvas);
     this.gameInputs = GameInputs(document);
     this.engine.addLayer(backgroundLayer);
     this.engine.addLayer(enemiesLayer);
     this.engine.addLayer(playerLayer);
     this.engine.addLayer(menuLayer);
+    menuLayer.selectCallback = this.game.bind(this);
     this.engine.start();
     this.mainMenu();
 };
@@ -259,15 +263,22 @@ var Frogger = function() {
 
 /* pause all layer and display the main menu */
 Frogger.prototype.mainMenu = function(result) {
-    var menu = this.engine.layersDict['menu'];
-    this.gameInputs(menu.actionHandler.bind(menu));
-    this.engine.layersDict['enemies'].running = false;
+    this.gameInputs(menuLayer.actionHandler.bind(menuLayer));
+    this.engine.layersDict.enemies.running = false;
     if(result) {
-        this.engine.layersDict['menu'].result = result;
+        this.engine.layersDict.menu.result = result;
     }
+};
+
+
+/* hide menu and play */
+Frogger.prototype.game = function(selection) {
+    menuLayer.visible = false;
+    playerLayer.drawables[0].image = selection;
+    this.gameInputs(playerLayer.drawables[0].actionHandler.bind(playerLayer));
+    enemiesLayer.running = true;
 };
 
 
 // Create and launch frogger
 var frogger = new Frogger();
-
