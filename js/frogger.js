@@ -38,6 +38,14 @@ backgroundLayer.onLoad = function(images) {
 };
 
 
+backgroundLayer.draw = function(context) {
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    Layer.prototype.draw.call(this, context);
+};
+
+
+
 /* Returns a random integer between min (included) and max (excluded) */
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -275,7 +283,7 @@ Frogger.prototype.mainMenu = function(result) {
 Frogger.prototype.game = function(selection) {
     menuLayer.visible = false;
     playerLayer.drawables[0].image = selection;
-    this.gameInputs(playerLayer.drawables[0].actionHandler.bind(playerLayer));
+    this.gameInputs(playerLayer.drawables[0].actionHandler.bind(playerLayer.drawables[0]));
     enemiesLayer.running = true;
 };
 
