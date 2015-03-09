@@ -183,7 +183,7 @@ enemiesLayer.update = function(now) {
     this.drawables.forEach(function(drawable) {
         drawable.update(delta);
         if(areCollided(drawable, playerLayer.drawables[0])) {
-            console.log('colide');
+            frogger.mainMenu(false);
         }
     }.bind(this));
 };
@@ -243,7 +243,6 @@ menuLayer.actionHandler = function(action) {
         case 'select':
             var selection = Math.floor(this.selector.x / 101) + 1;
             var image = this.drawables[selection].image;
-            console.log(this.drawables, selection, image)
             this.selectCallback(this.drawables[selection].image);
             break;
     }
@@ -272,10 +271,9 @@ var Frogger = function() {
 /* pause all layer and display the main menu */
 Frogger.prototype.mainMenu = function(result) {
     this.gameInputs(menuLayer.actionHandler.bind(menuLayer));
-    this.engine.layersDict.enemies.running = false;
-    if(result) {
-        this.engine.layersDict.menu.result = result;
-    }
+    enemiesLayer.running = false;
+    menuLayer.result = result;
+    menuLayer.visible = true;
 };
 
 
@@ -284,6 +282,7 @@ Frogger.prototype.game = function(selection) {
     menuLayer.visible = false;
     playerLayer.drawables[0].image = selection;
     this.gameInputs(playerLayer.drawables[0].actionHandler.bind(playerLayer.drawables[0]));
+    playerLayer.drawables[0].start();
     enemiesLayer.running = true;
 };
 
