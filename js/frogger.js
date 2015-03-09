@@ -108,6 +108,7 @@ Player.prototype.actionHandler = function(action) {
     switch(action) {
         case 'up':
             if(this.y > 83-30) {this.move(0, -83);}
+            else {frogger.mainMenu(true);}
             break;
         case 'right':
             if(this.x < 101*4) {this.move(101, 0);}
